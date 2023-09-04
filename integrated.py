@@ -2,34 +2,51 @@ import os
 import subprocess
 import speech_recognition as sr
 from gtts import gTTS
-from pydub import AudioSegment
-from pydub.playback import play
 import requests
 from PIL import Image
 import cv2
 from transformers import DetrImageProcessor, DetrForObjectDetection
 import torch
-from gtts import gTTS
-from playsound import playsound
 import pygame
 from collections import Counter
 import pytesseract
+import random
+import sys
+import time
 
-# def transcribe_audio_from_microphone():
-recognizer = sr.Recognizer()
-microphone = sr.Microphone()
-with microphone as source:
-    recognizer.adjust_for_ambient_noise(source)
-    print("Say something!")
-    audio = recognizer.listen(source, timeout=10.0)
-try:
-    transcription = recognizer.recognize_google(audio)
-    print("You said: " + transcription)
-    # return transcription
-except sr.UnknownValueError:
-    transcription = "Could not transcribe audio"
-    print(transcription)
-        # return transcription
+def transcribe_audio_from_microphone():
+    recognizer = sr.Recognizer()
+    microphone = sr.Microphone()
+    with microphone as source:
+        recognizer.adjust_for_ambient_noise(source)
+        print("Say something!")
+        say="welcome to drishti please say something"
+        language = 'en'
+
+        # Create a gTTS (Google Text-to-Speech) object
+        tts = gTTS(text=say, lang=language, slow=False)
+        ras=random.randint(3000, 30000000)
+        cccc = f"output{ras}.mp3"
+        # Save the generated audio to a file
+        tts.save(cccc)
+
+        # Initialize pygame mixer
+        pygame.mixer.init()
+
+        # Load the audio file
+        pygame.mixer.music.load(cccc)
+
+        # Play the audio using pygame
+        pygame.mixer.music.play()
+        audio = recognizer.listen(source, timeout=10.0)
+    try:
+        transcription = recognizer.recognize_google(audio)
+        print("You said: " + transcription)
+        return transcription
+    except sr.UnknownValueError:
+        transcription = "Could not transcribe audio"
+        print(transcription)
+        return transcription
 
 def capture_image_from_webcam():
     # Initialize the webcam
@@ -63,26 +80,29 @@ def ocr(image_path):
     # Print the extracted text
     print(text)
 
+    if text:
     # Language in which you want to convert
-    language = 'en'
+        language = 'en'
 
-    # Create a gTTS (Google Text-to-Speech) object
-    tts = gTTS(text=text, lang=language, slow=False)
+        # Create a gTTS (Google Text-to-Speech) object
+        tts = gTTS(text=text, lang=language, slow=False)
 
-    # Save the generated audio to a file
-    tts.save("output.mp3")
+        # Save the generated audio to a file
+        ras=random.randint(1000, 10000000)
+        ccc = f"output{ras}.mp3"
+        tts.save(ccc)
 
-    # Initialize pygame mixer
-    pygame.mixer.init()
+        # Initialize pygame mixer
+        pygame.mixer.init()
 
-    # Load the audio file
-    pygame.mixer.music.load("output.mp3")
+        # Load the audio file
+        pygame.mixer.music.load(ccc)
 
-    # Play the audio using pygame
-    pygame.mixer.music.play()
+        # Play the audio using pygame
+        pygame.mixer.music.play()
 
-    # Keep the script running to allow audio to play
-    input("Press Enter to exit...")
+        # # Keep the script running to allow audio to play
+        # input("Press Enter to exit...")
 
 def alert(image_path):
     image = Image.open(image_path)
@@ -120,31 +140,62 @@ def alert(image_path):
 
     # Create a gTTS (Google Text-to-Speech) object
     tts = gTTS(text=detected_labels_text1, lang=language, slow=False)
-
+    ras=random.randint(2000, 20000000)
+    cc = f"output{ras}.mp3"
     # Save the generated audio to a file
-    tts.save("output.mp3")
+    tts.save(cc)
 
     # Initialize pygame mixer
     pygame.mixer.init()
 
     # Load the audio file
-    pygame.mixer.music.load("output.mp3")
+    pygame.mixer.music.load(cc)
 
     # Play the audio using pygame
     pygame.mixer.music.play()
 
-    # Keep the script running to allow audio to play
-    input("Press Enter to exit...")
-
-# Capture an image from the webcam
+    # # Keep the script running to allow audio to play
+    # input("Press Enter to exit...")
 
 
+# Main loop for command recognition
+while True:
+    command = transcribe_audio_from_microphone()
 
-# Perform OCR if the transcription is "ocr"
-if transcription == "ocr":
-    image_path = capture_image_from_webcam()
-    ocr(image_path)
-# Perform object detection if the transcription is "alert"
-elif transcription == "alert":
-    image_path = capture_image_from_webcam()
-    alert(image_path)
+    if command == "exit":
+        bye = "exiting drishti goodbye"
+        language = 'en'
+
+        # Create a gTTS (Google Text-to-Speech) object
+        tts = gTTS(text=bye, lang=language, slow=False)
+        ras = random.randint(5000, 50000000)
+        cc = f"output{ras}.mp3"
+        # Save the generated audio to a file
+        tts.save(cc)
+
+        # Initialize pygame mixer
+        pygame.mixer.init()
+
+        # Load the audio file
+        pygame.mixer.music.load(cc)
+
+        # Play the audio using pygame
+        pygame.mixer.music.play()
+
+        # Add a delay to allow time for the message to be spoken
+        time.sleep(5)
+        break
+    elif command == "ocr":
+        image_path = capture_image_from_webcam()
+        if image_path is not None:
+            ocr(image_path)
+    elif command == "alert":
+        image_path = capture_image_from_webcam()
+        if image_path is not None:
+            alert(image_path)
+    elif command=="exit":
+        sys.exit()
+
+
+# End of the program
+print("Program has ended.")
