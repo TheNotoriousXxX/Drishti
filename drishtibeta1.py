@@ -346,8 +346,8 @@ while True:
         image_path = capture_image_from_webcam()
         if image_path is not None:
             pas(image_path)            
-    elif command=="exit":
-        sys.exit()
+    #elif command=="exit":
+    #    sys.exit()
 
 
 # End of the program
